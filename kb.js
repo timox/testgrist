@@ -30,7 +30,7 @@ class KanbanManager {
     async initGrist() {
         await grist.ready({
             requiredAccess: 'full',
-            columns: ['id', 'titre', 'description', 'statut', 'bureau', 'qui', 'urgence', 'impact']
+            columns: ['id', 'titre', 'description', 'statut', 'bureau', 'qui', 'urgence', 'impact','projet','strategie_id','strategie_action','strategie_objectif','strategie_sous_objectif']
         });
 
         const data = await grist.docApi.fetchTable(TABLE_ID);
