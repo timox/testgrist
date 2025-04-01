@@ -20,18 +20,31 @@
             border-radius: 8px;
             margin: 10px;
         }
-        .entete-a-faire { background: #fff3e0; }
-        .entete-en-cours { background: #e3f2fd; }
-        .entete-en-attente { background: #f0f4c3; }
-        .entete-bloque { background: #f8d7da; }
-        .entete-validation { background: #cce5ff; }
-        .entete-termine { background: #d4edda; }
+        /* Ajoutez ce CSS */
+.drag-handle {
+    cursor: move;
+    padding: 5px;
+    background: #eee;
+    display: inline-block;
+} 
+
         .entete-inconnu { background: #e9ecef; }
         .priority-1 { border-left: 4px solid #dc3545; }
         .priority-2 { border-left: 4px solid #ffc107; }
         .priority-3 { border-left: 4px solid #6c757d; }
         .priority-4 { border-left: 4px solid #28a745; }
         .badge { margin: 2px; }
+        .entete-a-faire { background: #ff6b6b; color: white; }
+.entete-en-cours { background: #4ecdc4; color: white; }
+.entete-en-attente { background: #ffe66d; color: black; }
+.entete-bloque { background: #ff6b6b; color: white; }
+.entete-validation { background: #45b7d1; color: white; }
+.entete-termine { background: #82ca91; color: white; }
+
+.priority-1 { border-left: 5px solid #e55039; }
+.priority-2 { border-left: 5px solid #f6b93b; }
+.priority-3 { border-left: 5px solid #78e08f; }
+.priority-4 { border-left: 5px solid #82ccdd; }
     </style>
 </head>
 <body>
