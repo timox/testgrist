@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="grist-disable-source-maps" content="true"> <!-- Désactive les source maps -->
+    <title>Kanban SSIR v7.25</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/riktar/jkanban@1.3.1/dist/jkanban.min.css">
+    
+
+  
+
+    <style>
+        .kanban-column { 
+            width: 320px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 10px;
+        }
+        .entete-a-faire { background: #fff3e0; }
+        .entete-en-cours { background: #e3f2fd; }
+        .entete-en-attente { background: #f0f4c3; }
+        .entete-bloque { background: #f8d7da; }
+        .entete-validation { background: #cce5ff; }
+        .entete-termine { background: #d4edda; }
+        .entete-inconnu { background: #e9ecef; }
+        .priority-1 { border-left: 4px solid #dc3545; }
+        .priority-2 { border-left: 4px solid #ffc107; }
+        .priority-3 { border-left: 4px solid #6c757d; }
+        .priority-4 { border-left: 4px solid #28a745; }
+        .badge { margin: 2px; }
+    </style>
+</head>
+<body>
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between mb-4">
+        <h1>Kanban SSIR</h1>
+        <button id="btn-new-task" class="btn btn-primary">+ Nouvelle tâche</button>
+    </div>
+    
+    <div id="kanban-container" class="d-flex flex-wrap gap-3"></div>
+
+    <!-- Modal simplifié -->
+    <div class="modal fade" id="popup-tache">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Édition de tâche</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label>Titre</label>
+                            <input type="text" id="popup-titre" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="popup-description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Statut</label>
+                                    <select id="popup-statut" class="form-control">
+                                        ${STATUTS.map(s => `<option value="${s.id}">${s.libelle}</option>`).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Projet</label>
+                                    <input type="text" id="popup-projet" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Bureau</label>
+                                    <select id="popup-bureau" multiple class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Responsables</label>
+                                    <select id="popup-qui" multiple class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="popup-sauvegarder">Enregistrer</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>  
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.5.0/js/all.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/perfect-scrollbar@1.5.5/dist/perfect-scrollbar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/riktar/jkanban@1.3.1/dist/jkanban.min.js"></script>
+   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+</body>
+</html>
