@@ -1,129 +1,388 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="grist-disable-source-maps" content="true"> <!-- Désactive les source maps -->
-    <title>Kanban SSIR v7.25</title>
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/riktar/jkanban@1.3.1/dist/jkanban.min.css">
-    
-
-  
-
-    <style>
-        .kanban-column { 
-            width: 320px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin: 10px;
-        }
-        /* Ajoutez ce CSS */
+  <meta charset="UTF-8">
+  <title>Tableau Kanban SSIR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    /* === Styles Kanban d'origine V9.16 === */
+    :root {
+      --kanban-bg: #f8f9fa;
+      --kanban-card-bg: #ffffff;
+      --kanban-border: #dee2e6;
+      --kanban-text: #212529;
+      --kanban-text-muted: #6c757d;
+      --kanban-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      --kanban-shadow-hover: 0 4px 8px rgba(0,0,0,0.15);
+      --kanban-border-radius: 8px;
+      --kanban-transition: all 0.2s ease;
+    }
+    body {
+      background-color: var(--kanban-bg);
+      color: var(--kanban-text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: var(--kanban-transition);
+    }
+    .kanban-header {
+      background: var(--kanban-card-bg);
+      border-bottom: 1px solid var(--kanban-border);
+      padding: 1rem 0;
+      margin-bottom: 1rem;
+      box-shadow: var(--kanban-shadow);
+    }
+    .kanban-controls {
+      background: var(--kanban-card-bg);
+      border-radius: var(--kanban-border-radius);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--kanban-shadow);
+      border: 1px solid var(--kanban-border);
+    }
+    .kanban-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      padding: 0 1rem;
+    }
+    .kanban-board {
+      background: var(--kanban-card-bg);
+      border-radius: var(--kanban-border-radius);
+      border: 1px solid var(--kanban-border);
+      box-shadow: var(--kanban-shadow);
+      transition: var(--kanban-transition);
+      min-height: 200px;
+    }
+    .kanban-board-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--kanban-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+    .board-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .board-count {
+      background: var(--kanban-text-muted);
+      color: var(--kanban-card-bg);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .kanban-board-body {
+      padding: 1rem;
+      min-height: 150px;
+    }
+    .kanban-item {
+      background: var(--kanban-card-bg);
+      border: 1px solid var(--kanban-border);
+      border-radius: var(--kanban-border-radius);
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      cursor: grab;
+      transition: var(--kanban-transition);
+      box-shadow: var(--kanban-shadow);
+    }
+    .kanban-item:hover {
+      box-shadow: var(--kanban-shadow-hover);
+      transform: translateY(-1px);
+    }
+    .kanban-item:active {
+      cursor: grabbing;
+    }
+    .kanban-item.sortable-ghost {
+      opacity: 0.4;
+    }
+    .kanban-item.sortable-chosen {
+      transform: rotate(2deg);
+    }
+    .kanban-item.sortable-drag {
+      transform: rotate(5deg);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    .item-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--kanban-text);
+    }
+    .item-description {
+      font-size: 0.875rem;
+      color: var(--kanban-text-muted);
+      margin-bottom: 0.75rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .item-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .item-badges {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+    }
+    .priority-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    .priority-immediate { background-color: #dc3545; color: white; }
+    .priority-courte { background-color: #fd7e14; color: white; }
+    .priority-moyenne { background-color: #ffc107; color: #000; }
+    .priority-longue { background-color: #198754; color: white; }
+    .impact-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    .impact-critique { background-color: #dc3545; color: white; }
+    .impact-important { background-color: #fd7e14; color: white; }
+    .impact-modéré { background-color: #0dcaf0; color: #000; }
+    .impact-mineur { background-color: #6c757d; color: white; }
+    .item-assignees {
+      display: flex;
+      gap: 0.25rem;
+    }
+    .assignee-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #007bff, #6f42c1);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .board-backlog { border-top: 4px solid #6c757d; }
+    .board-a-faire { border-top: 4px solid #0dcaf0; }
+    .board-en-cours { border-top: 4px solid #fd7e14; }
+    .board-en-attente { border-top: 4px solid #ffc107; }
+    .board-bloque { border-top: 4px solid #dc3545; }
+    .board-validation { border-top: 4px solid #6f42c1; }
+    .board-termine { border-top: 4px solid #198754; }
+    .board-hidden { display: none; }
+    .modal-content {
+      background-color: var(--kanban-card-bg);
+      border: 1px solid var(--kanban-border);
+      color: var(--kanban-text);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .modal-header {
+      background: linear-gradient(135deg, #6f42c1, #007bff);
+      color: white;
+      border-radius: 16px 16px 0 0;
+      padding: 1.5rem;
+    }
+    .modal-footer {
+      background: #f8f9fa;
+      border-radius: 0 0 16px 16px;
+    }
+    /* Ajout pour délai */
+    .delai-indicator {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+    .delai-depasse { background: #ffe3e3; color: #dc3545; }
+    .delai-urgent { background: #fff3cd; color: #fd7e14; }
+    .delai-ok { background: #d4edda; color: #28a745; }
+    .kanban-item {
+  position: relative;
+}
 .drag-handle {
-    cursor: move;
-    padding: 5px;
-    background: #eee;
-    display: inline-block;
-} 
-
-        .entete-inconnu { background: #e9ecef; }
-        .priority-1 { border-left: 4px solid #dc3545; }
-        .priority-2 { border-left: 4px solid #ffc107; }
-        .priority-3 { border-left: 4px solid #6c757d; }
-        .priority-4 { border-left: 4px solid #28a745; }
-        .badge { margin: 2px; }
-        .entete-a-faire { background: #ff6b6b; color: white; }
-.entete-en-cours { background: #4ecdc4; color: white; }
-.entete-en-attente { background: #ffe66d; color: black; }
-.entete-bloque { background: #ff6b6b; color: white; }
-.entete-validation { background: #45b7d1; color: white; }
-.entete-termine { background: #82ca91; color: white; }
-
-.priority-1 { border-left: 5px solid #e55039; }
-.priority-2 { border-left: 5px solid #f6b93b; }
-.priority-3 { border-left: 5px solid #78e08f; }
-.priority-4 { border-left: 5px solid #82ccdd; }
-    </style>
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  cursor: grab;
+  color: #888;
+  z-index: 2;
+  font-size: 1.2em;
+  opacity: 0.7;
+}
+.drag-handle:hover {
+  color: #333;
+  opacity: 1;
+}
+.editable-zone {
+  margin-left: 32px;
+  cursor: pointer;
+}
+  </style>
 </head>
 <body>
-<div class="container-fluid p-4">
-    <div class="d-flex justify-content-between mb-4">
-        <h1>Kanban SSIR</h1>
-        <button id="btn-new-task" class="btn btn-primary">+ Nouvelle tâche</button>
-    </div>
-    
-    <div id="kanban-container" class="d-flex flex-wrap gap-3"></div>
-
-    <!-- Modal simplifié -->
-    <div class="modal fade" id="popup-tache">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Édition de tâche</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="form-group">
-                            <label>Titre</label>
-                            <input type="text" id="popup-titre" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Description</label>
-                            <textarea id="popup-description" class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Statut</label>
-                                    <select id="popup-statut" class="form-control">
-                                        ${STATUTS.map(s => `<option value="${s.id}">${s.libelle}</option>`).join('')}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Projet</label>
-                                    <input type="text" id="popup-projet" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Bureau</label>
-                                    <select id="popup-bureau" multiple class="form-control"></select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Responsables</label>
-                                    <select id="popup-qui" multiple class="form-control"></select>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="popup-sauvegarder">Enregistrer</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                </div>
-            </div>
+  <div class="container-fluid">
+    <div class="kanban-header">
+      <div class="container-fluid">
+        <div class="row align-items-center">
+          <div class="col">
+            <h1 class="h3 mb-0">
+              <i class="bi bi-kanban me-2"></i>
+              Tableau Kanban SSIR
+            </h1>
+          </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-primary" id="btn-nouvelle-tache" aria-label="Créer une nouvelle tâche">
+              <i class="bi bi-plus-lg me-2"></i>Nouvelle Tâche
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-
-
- <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>  
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"></script>
-    <script src="https://use.fontawesome.com/releases/v5.5.0/js/all.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/perfect-scrollbar@1.5.5/dist/perfect-scrollbar.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/riktar/jkanban@1.3.1/dist/jkanban.min.js"></script>
-   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+    <div class="container-fluid">
+      <div class="kanban-controls">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-3">
+            <input type="text" class="form-control" id="search-input" placeholder="Rechercher..." aria-label="Rechercher des tâches">
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" id="filter-bureau" aria-label="Filtrer par bureau"></select>
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" id="filter-qui" aria-label="Filtrer par responsable"></select>
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" id="filter-projet" aria-label="Filtrer par projet"></select>
+          </div>
+          <div class="col-md-2">
+            <select class="form-select" id="filter-statut" aria-label="Filtrer par statut"></select>
+          </div>
+          <div class="col-md-1">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="show-termine" checked>
+              <label class="form-check-label" for="show-termine">Terminés</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="error-container" role="alert" aria-live="polite"></div>
+    <div class="loading-spinner" id="loading-spinner" style="display:none;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+      <p class="mt-2">Chargement du Kanban...</p>
+    </div>
+    <div class="container-fluid">
+      <div id="kanban-container" class="kanban-container" role="main" aria-label="Tableau Kanban"></div>
+    </div>
+    <div class="keyboard-shortcuts">
+      <div><kbd>N</kbd> Nouvelle tâche</div>
+      <div><kbd>F</kbd> Focus recherche</div>
+      <div><kbd>T</kbd> Basculer thème</div>
+    </div>
+  </div>
+  <!-- MODALE -->
+  <div class="modal fade" id="popup-tache" tabindex="-1" aria-labelledby="popup-tache-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="popup-tache-label">
+            <i class="bi bi-card-checklist me-2"></i>Détails Tâche
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <form id="task-form" novalidate>
+            <input type="hidden" id="popup-id">
+            <div class="row g-3">
+              <div class="col-12">
+                <label for="popup-titre" class="form-label">Titre *</label>
+                <input type="text" class="form-control" id="popup-titre" required>
+                <div class="form-text">Saisissez un titre descriptif pour la tâche</div>
+              </div>
+              <div class="col-12">
+                <label for="popup-description" class="form-label">Description</label>
+                <textarea class="form-control" id="popup-description" rows="3"></textarea>
+              </div>
+              <div class="col-md-6">
+                <label for="popup-statut-text" class="form-label">Statut *</label>
+                <input type="text" class="form-control" id="popup-statut-text" readonly required>
+              </div>
+              <div class="col-md-6">
+                <label for="popup-projet" class="form-label">Projet</label>
+                <div class="input-group">
+                  <select class="form-select" id="popup-projet">
+                    <option value="">-- Choisir un projet --</option>
+                  </select>
+                  <input type="text" class="form-control" id="projet-ajout" placeholder="Ajouter projet">
+                  <button class="btn btn-outline-secondary" type="button" id="btn-ajout-projet"><i class="bi bi-plus"></i></button>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="popup-urgence" class="form-label">Urgence</label>
+                <select class="form-select" id="popup-urgence">
+                  <option value="">-- Choisir l'urgence --</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="popup-impact" class="form-label">Impact</label>
+                <select class="form-select" id="popup-impact">
+                  <option value="">-- Choisir l'impact --</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="popup-bureau" class="form-label">Bureaux</label>
+                <select class="form-select" id="popup-bureau" multiple size="4"></select>
+                <div class="form-text">Maintenez Ctrl pour sélectionner plusieurs bureaux</div>
+              </div>
+              <div class="col-md-6">
+                <label for="popup-qui" class="form-label">Responsables</label>
+                <select class="form-select" id="popup-qui" multiple size="4"></select>
+                <div class="form-text">Maintenez Ctrl pour sélectionner plusieurs responsables</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label"><i class="bi bi-calendar-event me-2"></i>Délai / Date butoir</label>
+                <div class="input-group">
+                  <select class="form-select" id="delai-type" style="max-width: 120px;">
+                    <option value="date">Date fixe</option>
+                    <option value="semaines">Semaines</option>
+                    <option value="mois">Mois</option>
+                  </select>
+                  <input type="text" class="form-control" id="popup-delai" placeholder="Sélectionner..." aria-label="Délai">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-2"></i>Fermer
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-save-task">
+            <i class="bi bi-check2-circle me-2"></i>Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
 </body>
 </html>
